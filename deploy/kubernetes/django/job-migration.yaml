@@ -1,25 +1,15 @@
-apiVersion: apps/v1
-kind: Deployment
+# THIS HAS BEEN LEFT FOR HISTORIC PURPOSES
+apiVersion: batch/v1
+kind: Job
 metadata:
-  name: django
-  labels:
-    app: django
+  name: django-migrations
 spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: django-container
   template:
-    metadata:
-      labels:
-        app: django-container
     spec:
       containers:
         - name: django
           image: gitumarkk/k8_django_minikube:part_3
-          command: ['/bin/bash', 'run.sh'] # runs migrations and starts the server
-          ports:
-            - containerPort: 8000
+          command: ['python', 'manage.py', 'migrate']
           env:
             - name: POSTGRES_USER
               valueFrom:
@@ -35,3 +25,5 @@ spec:
 
             - name: POSTGRES_HOST
               value: postgres-service
+      restartPolicy: Never
+  backoffLimit: 5
