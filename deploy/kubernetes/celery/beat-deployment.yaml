@@ -1,25 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: django
+  name: celery-beat
   labels:
-    deployment: django
+    deployment: celery-beat
 spec:
   replicas: 1
   selector:
     matchLabels:
-      pod: django
+      pod: celery-beat
   template:
     metadata:
       labels:
-        pod: django
+        pod: celery-beat
     spec:
       containers:
-        - name: django
+        - name: celery-beat
           image: gitumarkk/k8_django_minikube:part_4
-          command: ['/bin/bash', 'run.sh'] # runs migrations and starts the server
-          ports:
-            - containerPort: 8000
+          command: ['celery', '-A', 'kubernetes_django', 'beat', '-l', 'DEBUG']
           env:
             - name: POSTGRES_USER
               valueFrom:
